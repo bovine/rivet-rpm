@@ -41,6 +41,7 @@ autoreconf
             --with-tclsh=%{_bindir}/tclsh8.5   \
 	    --with-apache=%{_prefix}           \
             --with-apache-version=2            \
+	    --with-rivet-target-dir=%{_libdir}/httpd/rivet%{version}   \
             --disable-debug \
             --with-pic \
             --disable-rpath
@@ -56,46 +57,34 @@ make
 
 
 %install
-#[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-# start with an empty rivet-tcl directory
-make uninstall-local
-
-# actually install
-make install
-
-# Install the default configuration file and icons
-#install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/
-#install -m 644 $RPM_SOURCE_DIR/php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-#install -m 755 -d $RPM_BUILD_ROOT%{contentdir}/icons
-#install -m 644    *.gif $RPM_BUILD_ROOT%{contentdir}/icons/
-
-# install the DSO
-#install -m 755 -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules
-#install -m 755 build-apache/libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/httpd/modules
-
-# install the ZTS DSO
-#install -m 755 build-zts/libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/httpd/modules/libphp5-zts.so
-
-# Apache config fragment
-#install -m 755 -d $RPM_BUILD_ROOT/etc/httpd/conf.d
-#install -m 644 $RPM_SOURCE_DIR/php.conf $RPM_BUILD_ROOT/etc/httpd/conf.d
-
-#install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php.d
-#install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/lib/php
-#install -m 700 -d $RPM_BUILD_ROOT%{_localstatedir}/lib/php/session
-
+make DESTDIR=$RPM_BUILD_ROOT install
 
 # Remove unpackaged files
-#rm -rf $RPM_BUILD_ROOT%{_libdir}/php/modules/*.a \
-#       $RPM_BUILD_ROOT%{_bindir}/{phptar} \
-#       $RPM_BUILD_ROOT%{_datadir}/pear \
-#       $RPM_BUILD_ROOT%{_libdir}/libphp5.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/httpd/modules/mod_rivet.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/httpd/rivet%{version}/librivet*.la
 
-rm -f %{_libdir}/httpd/modules/mod_rivet.la
 
-# Remove irrelevant docs
-#rm -f README.{Zeus,QNX,CVS-RULES}
+# Create an Apache conf include
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d
+cat <<EOT >$RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/rivet.conf
+
+# Loads the module.
+LoadModule rivet_module modules/mod_rivet.so
+
+# Let the module handle .rvt and .tcl files.
+AddType application/x-httpd-rivet  rvt
+AddType application/x-rivet-tcl    tcl
+
+# The default charset can be specified in the configuration
+AddType "application/x-httpd-rivet; charset=utf-8" rvt
+
+# Add index.rvt to the list of files that will be served
+DirectoryIndex index.rvt
+
+EOT
+
 
 
 %clean
@@ -104,26 +93,79 @@ rm -f %{_libdir}/httpd/modules/mod_rivet.la
 
 %files
 %defattr(-,root,root)
-%{_libdir}/httpd/modules/mod_rivet.so
-%dir %{_libdir}/rivet%{version}
-%attr(0755,root,root) %{_libdir}/rivet%{version}/librivet*.so
+%attr(0755,root,root) %{_libdir}/httpd/modules/mod_rivet.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/rivet.conf
+%dir %{_libdir}/httpd/rivet%{version}
+%{_libdir}/httpd/rivet%{version}/README
+%{_libdir}/httpd/rivet%{version}/init.tcl
+%attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivet.so
+%attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivetparser.so
+%{_libdir}/httpd/rivet%{version}/pkgIndex.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages
+%{_libdir}/httpd/rivet%{version}/packages/README
+%dir %{_libdir}/httpd/rivet%{version}/packages/commserver
+%{_libdir}/httpd/rivet%{version}/packages/commserver/commserver.tcl
+%{_libdir}/httpd/rivet%{version}/packages/commserver/server.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages/dio
+%{_libdir}/httpd/rivet%{version}/packages/dio/dio.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Mysql.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Oracle.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Postgresql.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Sqlite.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/diodisplay.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/pkgIndex.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages/dtcl
+%{_libdir}/httpd/rivet%{version}/packages/dtcl/dtcl.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dtcl/pkgIndex.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages/form
+%{_libdir}/httpd/rivet%{version}/packages/form/form.tcl
+%{_libdir}/httpd/rivet%{version}/packages/form/pkgIndex.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages/rivet_ncgi
+%{_libdir}/httpd/rivet%{version}/packages/rivet_ncgi/rivet_ncgi.tcl
+%dir %{_libdir}/httpd/rivet%{version}/packages/session
+%{_libdir}/httpd/rivet%{version}/packages/session/README.txt
+%{_libdir}/httpd/rivet%{version}/packages/session/pkgIndex.tcl
+%{_libdir}/httpd/rivet%{version}/packages/session/session-class.tcl
+%{_libdir}/httpd/rivet%{version}/packages/session/session-create-mysql.sql
+%{_libdir}/httpd/rivet%{version}/packages/session/session-create-oracle.sql
+%{_libdir}/httpd/rivet%{version}/packages/session/session-create.sql
+%{_libdir}/httpd/rivet%{version}/packages/session/session-demo.rvt
+%{_libdir}/httpd/rivet%{version}/packages/session/session-drop.sql
+%{_libdir}/httpd/rivet%{version}/packages/session/session-httpd.conf
+%{_libdir}/httpd/rivet%{version}/packages/session/session-purge-mysql.sql
+%dir %{_libdir}/httpd/rivet%{version}/packages/simpledb
+%{_libdir}/httpd/rivet%{version}/packages/simpledb/pkgIndex.tcl
+%{_libdir}/httpd/rivet%{version}/packages/simpledb/simpledb.tcl
+%{_libdir}/httpd/rivet%{version}/packages/simpledb/simpledb.test
+%dir %{_libdir}/httpd/rivet%{version}/packages/tclrivet
+%{_libdir}/httpd/rivet%{version}/packages/tclrivet/README
+%{_libdir}/httpd/rivet%{version}/packages/tclrivet/parse.tcl
+%{_libdir}/httpd/rivet%{version}/packages/tclrivet/pkgIndex.tcl
+%{_libdir}/httpd/rivet%{version}/packages/tclrivet/tclrivet.tcl
+%{_libdir}/httpd/rivet%{version}/packages/tclrivet/tclrivetparser.tcl
+%dir %{_libdir}/httpd/rivet%{version}/rivet-tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/README
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/cookie.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/debug.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/html.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/import_keyvalue_pairs.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/import_switch_args.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/incr0.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/lassign.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/lempty.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/lmatch.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/load_cookies.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/load_response.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/parray.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/random.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/read_file.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/rivet_command_document.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/tclIndex
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/wrap.tcl
+
+
 
 #%doc CODING_STANDARDS CREDITS EXTENSIONS INSTALL LICENSE NEWS README*
-#%attr(0770,root,apache) %dir %{_localstatedir}/lib/php/session
-#%config(noreplace) %{_sysconfdir}/httpd/conf.d/php.conf
-#%{contentdir}/icons/php.gif
-
-#%files common -f files.common
-#%defattr(-,root,root)
-#%doc Zend/ZEND_* TSRM_LICENSE regex_COPYRIGHT
-#%config(noreplace) %{_sysconfdir}/php.ini
-#%dir %{_sysconfdir}/php.d
-#%dir %{_libdir}/php
-#%dir %{_libdir}/php/modules
-#%dir %{_localstatedir}/lib/php
-#%dir %{_libdir}/php/pear
-#%dir %{_datadir}/php
-
 
 %changelog
 * Wed Apr 14 2010 Jeff Lawson <jeff@bovine.net> 0.8.0-20100414032008
