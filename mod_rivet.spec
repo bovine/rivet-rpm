@@ -5,20 +5,25 @@
 Summary: Apache Rivet lets you use the Tcl scripting language to create dynamic web sites
 Name: mod_rivet
 Version: 0.8.0
-Release: %{rivet_snapshot}%{?dist}
+Release: 0.%{rivet_snapshot}.1%{?dist}
 License: Apache License Version 2.0
 Group: Development/Languages
 URL: http://tcl.apache.org/rivet/
 
 Source0: http://cvs.apache.org/snapshots/tcl-rivet/tcl-rivet_%{rivet_snapshot}.tar.gz
-
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: httpd-devel >= 2.0.46-1
-BuildRequires: gcc-c++, libstdc++-devel
-BuildRequires: tcl >= 8.5, tcl-devel >= 8.5
-BuildRequires: autoconf >= 2.59, automake >= 1.9, libtool >= 1.4.3
+BuildRequires: gcc-c++
+BuildRequires: libstdc++-devel
+BuildRequires: tcl >= 8.5
+BuildRequires: tcl-devel >= 8.5
+BuildRequires: autoconf >= 2.59
+BuildRequires: automake >= 1.9
+BuildRequires: libtool >= 1.4.3
+
 Provides: mod_rivet = %{version}-%{release}
+
 Requires: httpd
 Requires: tcl >= 8.5
 
@@ -33,8 +38,8 @@ generated webpages in Tcl.
 
 %build
 
-aclocal
-autoreconf
+%{__aclocal}
+autoreconf -vfs
 
 %configure --with-tcl=%{_libdir}/tcl8.5/       \
             --with-apxs=%{_sbindir}/apxs       \
@@ -45,31 +50,28 @@ autoreconf
             --disable-debug \
             --with-pic \
             --disable-rpath
+
 if test $? != 0; then 
   tail -500 config.log
   : configure failed
   exit 1
 fi
 
-make
-make doc
-
-%check
+%{__make} %{?_smp_mflags} 
+%{__make} %{?_smp_mflags} doc
 
 
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-make DESTDIR=$RPM_BUILD_ROOT install
+%{__make} install DESTDIR=%{buildroot}
 
-# Remove unpackaged files
-rm -f $RPM_BUILD_ROOT%{_libdir}/httpd/modules/mod_rivet.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/httpd/rivet%{version}/librivet*.la
-
+# Remove static libraries
+rm -f %{buildroot}%{_libdir}/httpd/modules/mod_rivet.la
+rm -f %{buildroot}%{_libdir}/httpd/rivet%{version}/librivet*.la
 
 # Create an Apache conf include
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d
-cat <<EOT >$RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/rivet.conf
+mkdir -p %{buildroot}/%{_sysconfdir}/httpd/conf.d
+cat <<EOT >%{buildroot}/%{_sysconfdir}/httpd/conf.d/rivet.conf
 
 # Loads the module.
 LoadModule rivet_module modules/mod_rivet.so
@@ -88,17 +90,16 @@ EOT
 
 
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot} 
 
 
 %files
-%defattr(-,root,root)
-%attr(0755,root,root) %{_libdir}/httpd/modules/mod_rivet.so
+%defattr(-, root, root, 0755)
+%doc LICENSE NOTICE contrib doc/html doc/examples
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/rivet.conf
-
+%{_libdir}/httpd/modules/mod_rivet.so
 %{_libdir}/httpd/rivet%{version}
 
-%doc LICENSE NOTICE contrib doc/html doc/examples
 
 %changelog
 * Wed Apr 14 2010 Jeff Lawson <jeff@bovine.net> 0.8.0-20100414032008
