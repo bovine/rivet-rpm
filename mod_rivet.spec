@@ -52,6 +52,7 @@ if test $? != 0; then
 fi
 
 make
+make doc
 
 %check
 
@@ -86,7 +87,6 @@ DirectoryIndex index.rvt
 EOT
 
 
-
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
@@ -95,28 +95,21 @@ EOT
 %defattr(-,root,root)
 %attr(0755,root,root) %{_libdir}/httpd/modules/mod_rivet.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/rivet.conf
+
 %dir %{_libdir}/httpd/rivet%{version}
 %{_libdir}/httpd/rivet%{version}/README
 %{_libdir}/httpd/rivet%{version}/init.tcl
+%{_libdir}/httpd/rivet%{version}/pkgIndex.tcl
 %attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivet.so
 %attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivetparser.so
-%{_libdir}/httpd/rivet%{version}/pkgIndex.tcl
 %dir %{_libdir}/httpd/rivet%{version}/packages
 %{_libdir}/httpd/rivet%{version}/packages/README
 %dir %{_libdir}/httpd/rivet%{version}/packages/commserver
-%{_libdir}/httpd/rivet%{version}/packages/commserver/commserver.tcl
-%{_libdir}/httpd/rivet%{version}/packages/commserver/server.tcl
+%{_libdir}/httpd/rivet%{version}/packages/commserver/*.tcl
 %dir %{_libdir}/httpd/rivet%{version}/packages/dio
-%{_libdir}/httpd/rivet%{version}/packages/dio/dio.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Mysql.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Oracle.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Postgresql.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/dio_Sqlite.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/diodisplay.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dio/pkgIndex.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dio/*.tcl
 %dir %{_libdir}/httpd/rivet%{version}/packages/dtcl
-%{_libdir}/httpd/rivet%{version}/packages/dtcl/dtcl.tcl
-%{_libdir}/httpd/rivet%{version}/packages/dtcl/pkgIndex.tcl
+%{_libdir}/httpd/rivet%{version}/packages/dtcl/*.tcl
 %dir %{_libdir}/httpd/rivet%{version}/packages/form
 %{_libdir}/httpd/rivet%{version}/packages/form/form.tcl
 %{_libdir}/httpd/rivet%{version}/packages/form/pkgIndex.tcl
@@ -124,15 +117,10 @@ EOT
 %{_libdir}/httpd/rivet%{version}/packages/rivet_ncgi/rivet_ncgi.tcl
 %dir %{_libdir}/httpd/rivet%{version}/packages/session
 %{_libdir}/httpd/rivet%{version}/packages/session/README.txt
-%{_libdir}/httpd/rivet%{version}/packages/session/pkgIndex.tcl
-%{_libdir}/httpd/rivet%{version}/packages/session/session-class.tcl
-%{_libdir}/httpd/rivet%{version}/packages/session/session-create-mysql.sql
-%{_libdir}/httpd/rivet%{version}/packages/session/session-create-oracle.sql
-%{_libdir}/httpd/rivet%{version}/packages/session/session-create.sql
+%{_libdir}/httpd/rivet%{version}/packages/session/*.tcl
+%{_libdir}/httpd/rivet%{version}/packages/session/*.sql
 %{_libdir}/httpd/rivet%{version}/packages/session/session-demo.rvt
-%{_libdir}/httpd/rivet%{version}/packages/session/session-drop.sql
 %{_libdir}/httpd/rivet%{version}/packages/session/session-httpd.conf
-%{_libdir}/httpd/rivet%{version}/packages/session/session-purge-mysql.sql
 %dir %{_libdir}/httpd/rivet%{version}/packages/simpledb
 %{_libdir}/httpd/rivet%{version}/packages/simpledb/pkgIndex.tcl
 %{_libdir}/httpd/rivet%{version}/packages/simpledb/simpledb.tcl
@@ -145,27 +133,10 @@ EOT
 %{_libdir}/httpd/rivet%{version}/packages/tclrivet/tclrivetparser.tcl
 %dir %{_libdir}/httpd/rivet%{version}/rivet-tcl
 %{_libdir}/httpd/rivet%{version}/rivet-tcl/README
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/cookie.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/debug.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/html.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/import_keyvalue_pairs.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/import_switch_args.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/incr0.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/lassign.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/lempty.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/lmatch.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/load_cookies.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/load_response.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/parray.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/random.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/read_file.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/rivet_command_document.tcl
+%{_libdir}/httpd/rivet%{version}/rivet-tcl/*.tcl
 %{_libdir}/httpd/rivet%{version}/rivet-tcl/tclIndex
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/wrap.tcl
 
-
-
-#%doc CODING_STANDARDS CREDITS EXTENSIONS INSTALL LICENSE NEWS README*
+%doc LICENSE NOTICE contrib doc/html doc/examples
 
 %changelog
 * Wed Apr 14 2010 Jeff Lawson <jeff@bovine.net> 0.8.0-20100414032008
