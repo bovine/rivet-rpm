@@ -1,5 +1,5 @@
 %define contentdir /var/www
-%define rivet_snapshot 20100414032008
+%define rivet_snapshot 20100415152036
 %define debug_package %{nil} 
 
 Summary: Apache Rivet lets you use the Tcl scripting language to create dynamic web sites
@@ -96,45 +96,7 @@ EOT
 %attr(0755,root,root) %{_libdir}/httpd/modules/mod_rivet.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/rivet.conf
 
-%dir %{_libdir}/httpd/rivet%{version}
-%{_libdir}/httpd/rivet%{version}/README
-%{_libdir}/httpd/rivet%{version}/init.tcl
-%{_libdir}/httpd/rivet%{version}/pkgIndex.tcl
-%attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivet.so
-%attr(0755,root,root) %{_libdir}/httpd/rivet%{version}/librivetparser.so
-%dir %{_libdir}/httpd/rivet%{version}/packages
-%{_libdir}/httpd/rivet%{version}/packages/README
-%dir %{_libdir}/httpd/rivet%{version}/packages/commserver
-%{_libdir}/httpd/rivet%{version}/packages/commserver/*.tcl
-%dir %{_libdir}/httpd/rivet%{version}/packages/dio
-%{_libdir}/httpd/rivet%{version}/packages/dio/*.tcl
-%dir %{_libdir}/httpd/rivet%{version}/packages/dtcl
-%{_libdir}/httpd/rivet%{version}/packages/dtcl/*.tcl
-%dir %{_libdir}/httpd/rivet%{version}/packages/form
-%{_libdir}/httpd/rivet%{version}/packages/form/form.tcl
-%{_libdir}/httpd/rivet%{version}/packages/form/pkgIndex.tcl
-%dir %{_libdir}/httpd/rivet%{version}/packages/rivet_ncgi
-%{_libdir}/httpd/rivet%{version}/packages/rivet_ncgi/rivet_ncgi.tcl
-%dir %{_libdir}/httpd/rivet%{version}/packages/session
-%{_libdir}/httpd/rivet%{version}/packages/session/README.txt
-%{_libdir}/httpd/rivet%{version}/packages/session/*.tcl
-%{_libdir}/httpd/rivet%{version}/packages/session/*.sql
-%{_libdir}/httpd/rivet%{version}/packages/session/session-demo.rvt
-%{_libdir}/httpd/rivet%{version}/packages/session/session-httpd.conf
-%dir %{_libdir}/httpd/rivet%{version}/packages/simpledb
-%{_libdir}/httpd/rivet%{version}/packages/simpledb/pkgIndex.tcl
-%{_libdir}/httpd/rivet%{version}/packages/simpledb/simpledb.tcl
-%{_libdir}/httpd/rivet%{version}/packages/simpledb/simpledb.test
-%dir %{_libdir}/httpd/rivet%{version}/packages/tclrivet
-%{_libdir}/httpd/rivet%{version}/packages/tclrivet/README
-%{_libdir}/httpd/rivet%{version}/packages/tclrivet/parse.tcl
-%{_libdir}/httpd/rivet%{version}/packages/tclrivet/pkgIndex.tcl
-%{_libdir}/httpd/rivet%{version}/packages/tclrivet/tclrivet.tcl
-%{_libdir}/httpd/rivet%{version}/packages/tclrivet/tclrivetparser.tcl
-%dir %{_libdir}/httpd/rivet%{version}/rivet-tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/README
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/*.tcl
-%{_libdir}/httpd/rivet%{version}/rivet-tcl/tclIndex
+%{_libdir}/httpd/rivet%{version}
 
 %doc LICENSE NOTICE contrib doc/html doc/examples
 
