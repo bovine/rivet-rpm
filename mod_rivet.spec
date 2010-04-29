@@ -1,16 +1,14 @@
-%define contentdir /var/www
-%define rivet_snapshot 20100415152036
 %define debug_package %{nil} 
 
 Summary: Apache Rivet lets you use the Tcl scripting language to create dynamic web sites
 Name: mod_rivet
-Version: 0.8.0
-Release: 0.%{rivet_snapshot}.1%{?dist}
+Version: 2.0.0
+Release: 1%{?dist}
 License: Apache License Version 2.0
 Group: Development/Languages
 URL: http://tcl.apache.org/rivet/
 
-Source0: http://cvs.apache.org/snapshots/tcl-rivet/tcl-rivet_%{rivet_snapshot}.tar.gz
+Source0: http://www.apache.org/dist/tcl/rivet/rivet-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: httpd-devel >= 2.0.46-1
@@ -33,7 +31,7 @@ httpd that makes it easy easy for developers to write dynamically
 generated webpages in Tcl.
 
 %prep
-%setup -q -n tcl-rivet
+%setup -q -n rivet-%{version}
 
 
 %build
@@ -102,6 +100,9 @@ EOT
 
 
 %changelog
+* Thu Apr 29 2010 Jeff Lawson <jeff@bovine.net> 2.0.0
+- Update for new release.
+
 * Wed Apr 14 2010 Jeff Lawson <jeff@bovine.net> 0.8.0-20100414032008
 - Initial creation of rpm spec
 
