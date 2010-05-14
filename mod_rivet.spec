@@ -45,7 +45,6 @@ autoreconf -vfs
 	    --with-apache=%{_prefix}           \
             --with-apache-version=2            \
 	    --with-rivet-target-dir=%{_libdir}/httpd/rivet%{version}   \
-            --disable-debug \
             --with-pic \
             --disable-rpath
 
@@ -56,7 +55,7 @@ if test $? != 0; then
 fi
 
 %{__make} %{?_smp_mflags} 
-%{__make} %{?_smp_mflags} doc
+#%{__make} %{?_smp_mflags} doc
 
 
 %install
