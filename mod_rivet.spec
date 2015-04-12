@@ -1,29 +1,29 @@
-%define debug_package %{nil} 
+# $Id$
+# Authority: yury
+# Upstream: Apache Rivet team <rivet-dev$tcl,apache,org>
+
+%define real_name rivet
 
 Summary: Apache Rivet lets you use the Tcl scripting language to create dynamic web sites
 Name: mod_rivet
-Version: 2.0.0
+Version: 2.2.2
 Release: 1%{?dist}
 License: Apache License Version 2.0
 Group: Development/Languages
 URL: http://tcl.apache.org/rivet/
 
-Source0: http://www.apache.org/dist/tcl/rivet/rivet-%{version}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0: http://www.apache.org/dist/tcl/%{real_name}/%{real_name}-%{version}.tar.gz
+Source1: http://www.apache.org/dist/tcl/%{real_name}/%{real_name}-%{version}.tar.gz.asc
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: httpd-devel >= 2.0.46-1
+BuildRequires: httpd-devel >= 2.2
 BuildRequires: gcc-c++
 BuildRequires: libstdc++-devel
-BuildRequires: tcl >= 8.5
-BuildRequires: tcl-devel >= 8.5
-BuildRequires: autoconf >= 2.59
-BuildRequires: automake >= 1.9
-BuildRequires: libtool >= 1.4.3
-
-Provides: mod_rivet = %{version}-%{release}
+BuildRequires: tcl >= 8.5.10
+BuildRequires: tcl-devel >= 8.5.10
 
 Requires: httpd
-Requires: tcl >= 8.5
+Requires: tcl >= 8.5.10
 
 %description
 Tcl is a scripting language.  Apache Rivet is a module for Apache
@@ -33,29 +33,17 @@ generated webpages in Tcl.
 %prep
 %setup -q -n rivet-%{version}
 
-
 %build
 
-%{__aclocal}
-autoreconf -vfs
+%configure \
+    --with-apxs="%{_sbindir}/apxs"       \
+    --with-apache="%{_prefix}"           \
+    --with-rivet-target-dir="%{_libdir}/httpd/rivet%{version}"   \
+    --with-pic \
+    --disable-rpath
 
-%configure --with-tcl=%{_libdir}/tcl8.5/       \
-            --with-apxs=%{_sbindir}/apxs       \
-            --with-tclsh=%{_bindir}/tclsh8.5   \
-	    --with-apache=%{_prefix}           \
-            --with-apache-version=2            \
-	    --with-rivet-target-dir=%{_libdir}/httpd/rivet%{version}   \
-            --with-pic \
-            --disable-rpath
-
-if test $? != 0; then 
-  tail -500 config.log
-  : configure failed
-  exit 1
-fi
-
-%{__make} %{?_smp_mflags} 
-#%{__make} %{?_smp_mflags} doc
+%{__make} %{?_smp_mflags}
+%{__make} %{?_smp_mflags} doc
 
 
 %install
@@ -67,13 +55,13 @@ rm -f %{buildroot}%{_libdir}/httpd/modules/mod_rivet.la
 rm -f %{buildroot}%{_libdir}/httpd/rivet%{version}/librivet*.la
 
 # Create an Apache conf include
-mkdir -p %{buildroot}/%{_sysconfdir}/httpd/conf.d
-cat <<EOT >%{buildroot}/%{_sysconfdir}/httpd/conf.d/rivet.conf
+mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
+cat <<EOT >%{buildroot}%{_sysconfdir}/httpd/conf.d/rivet.conf
 
-# Loads the module.
+# Loads the module
 LoadModule rivet_module modules/mod_rivet.so
 
-# Let the module handle .rvt and .tcl files.
+# Let the module handle .rvt and .tcl files
 AddType application/x-httpd-rivet  rvt
 AddType application/x-rivet-tcl    tcl
 
@@ -87,7 +75,7 @@ EOT
 
 
 %clean
-%{__rm} -rf %{buildroot} 
+%{__rm} -rf %{buildroot}
 
 
 %files
@@ -99,9 +87,23 @@ EOT
 
 
 %changelog
-* Thu Apr 29 2010 Jeff Lawson <jeff@bovine.net> 2.0.0
-- Update for new release.
+* Sat Apr 11 2015 Jeff Lawson <jeff@bovine.net> - 2.2.2-1
+- Updated to release 2.2.2.
 
-* Wed Apr 14 2010 Jeff Lawson <jeff@bovine.net> 0.8.0-20100414032008
-- Initial creation of rpm spec
+* Tue Jun 26 2012 Jeff Lawson <jeff@bovine.net> - 2.0.4-1
+- Updated to release 2.0.5.
 
+* Thu Oct 6 2011 Jeff Lawson <jeff@bovine.net> - 2.0.4-1
+- Updated to release 2.0.4.
+
+* Thu Aug 11 2011 Yury V. Zaytsev <yury@shurup.com> - 2.0.3-1
+- Regenerating the build system is no longer necessary.
+- Rivet can be built against TCL 8.4, so why not?
+- Merged the updated version from Jeff.
+
+* Mon May 03 2010 Yury V. Zaytsev <yury@shurup.com> - 2.0.0-1
+- Merged the updated version from Jeff.
+
+* Thu Apr 15 2010 Yury V. Zaytsev <yury@shurup.com> - 0.8.0-0.20100414032008.1
+- Initial import of the SPEC by Jeff Lawson <jeff$bovine,net>, thanks!
+- Minor RPMForge-related tweaks.
